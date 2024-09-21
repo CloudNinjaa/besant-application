@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: besant-tech
+  labels: 
+    app: besant-tech
+    tier: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: besant-tech
+  template: 
+    metadata:
+      labels:
+        app: besant-tech
+        tier: frontend
+    specs:
+      containers:
+        - name: besant-tech
+          image: <image-name> # Add Your Image here
+          ports:
+            - containerPort: 80
