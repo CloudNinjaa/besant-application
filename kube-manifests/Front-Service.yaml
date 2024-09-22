@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: besant-tech-service
+  labels: 
+    app: besant-tech
+    tier: frontend     
+specs:
+  type: <typename> # Enter your type of port service you want [ClusterIp(default), NodePort or LoadBalancer]. 
+  selector:
+    app: besant-tech
+  ports: 
+    - name: http
+      port: 80
+      targetPort: 80
+      # nodePort: <port> uncomment this, if you want to use nodeport.
