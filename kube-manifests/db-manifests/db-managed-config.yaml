@@ -5,4 +5,4 @@ metadata:
 data: 
   mysql_usermgmt.sql: |-
     DROP DATABASE IF EXISTS database-name;
-    CREATE DATABASE usermgmt; 
+    CREATE DATABASE database-name; 
