@@ -37,7 +37,7 @@ pipeline {
                 echo 'Applying Kubernetes manifests...'
                 sh '''
                     export KUBECONFIG=$KUBECONFIG
-                    kubectl apply -f kube-manifest/db-manifests
+                    kubectl apply -f kube-manifest/db-manifests/
                     kubectl apply -f kube-manifest/
                 '''
             }
