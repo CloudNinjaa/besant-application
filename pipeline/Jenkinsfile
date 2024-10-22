@@ -1,0 +1,59 @@
+pipeline {
+    agent None
+
+    environment {
+        git_repo_url = "<url>"
+        git_repo_branchName = "<branch-name>"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKER_IMAGE = 'your-dockerhub-username/imagename'
+        KUBECONFIG = credentials('kubeconfig-eks-cluster')
+    }
+
+    stages {
+        stage('Cloning the repo') {
+            agent { label 'node1' }
+            steps {
+                echo "Cloning the git repository..."
+                git url: "${git_repo_url}", branch: "${git_repo_branchName}"
+            }
+        }
+
+        stage('Building and Pushing Docker Image') {
+            agent { label 'node1' }
+            steps {
+                echo 'Building Docker image...'
+                sh '''
+                    docker build -t $DOCKER_IMAGE .
+                    echo "Pushing Docker image to DockerHub..."
+                    docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW
+                    docker push $DOCKER_IMAGE
+                '''
+            }
+        }
+
+        stage('Deploying to Kubernetes') {
+            agent { label 'node2' }
+            steps {
+                echo 'Applying Kubernetes manifests...'
+                sh '''
+                    export KUBECONFIG=$KUBECONFIG
+                    kubectl apply -f kube-manifest/db-manifests/
+                    kubectl apply -f kube-manifest/
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up...'
+            sh 'docker system prune -f'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed. Check logs for details.'
+        }
+    }
+}
